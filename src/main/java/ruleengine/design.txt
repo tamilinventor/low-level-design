@@ -1,0 +1,84 @@
+Problem
+	Create a rule engine, where the input will be products (id, category, quantity) so based on the category the order quantity differs, make the code is extensible enough to extend the rule
+
+Requirements
+1. Based on the category, a product must satisfy the rule
+2. a rule should be extensible in future
+
+Out of scope
+- No code change for adding rule (For now, rules will be added manually in-memory). in future it could be from a property file/database
+
+
+Entities
+- Rule
+- Product
+- RuleEngine
+
+Enums
+- Category
+
+
+
+Class
+
+Product
+- id: String
+- category: Category
+- availableQuantity: long
++ getters/setters
+
+PurchaseContext
+- product: Product
+- user: User
+- purchaseQuantity: long
++ getters/setters
+
+User
+- id: String
+- name: String
++ getters/setters
+
+RuleEngine
+- ruleCategory: Category
+- conditions: List<Rule>
++ applyRules(PurchaseContext): ValidationResult
+
+ValidationResult
+- valid: boolean
+- breachedRule: Rule
+- reason: String
+
+
+Rule
+- id: String
+-
+
+my thought process was RuleEngine will do a interface, so ill move the - conditions: List<Rule> to somewhere but my though i need a class where it can contain multiple conditions and some interface will find the applicable rule and validate it against the purchaseContext
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+I got stuck here so i took some help from the claude and chatgpt to understand where did i made the mistake since i was confused on RuleEngine and Rule classes and stuck to move forward but my thought process was RuleEngine will do a interface, i know ruleCategory and consdition doesnt make sense here so ill move the both - conditions: List<Rule> to somewhere but my thought was i need a class where it can contain multiple conditions and some interface will find the applicable rule and validate it against the purchaseContext
+
+
+After the help i found that, i was trying to do lld for the more generic rule engine but for now it should be enough to apply rule for the category validation alone. So id change the design to be
+
+
+RuleEngine
+- rules: Map<Category, List<Rule>>
++ applyRules(PurchaseContext): ValidationResult
+
+Rule <<interface>>
++ validate(PurchaseContext): ValidationResult
+
+DefaultRule implements Rule
++ validate(PurchaseContext): ValidationResult
+
+ParacetamolRule implements Rule
++ validate(PurchaseContext): ValidationResult
+
+
+Primary Design Pattern used - Strategry since based on the condition the behaviour changes
+
+
+
